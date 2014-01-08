@@ -13,3 +13,15 @@ procesarCapability etiqueta= (procesarAtributo $ head $tail $ words et,procesarA
 
 procesarAtributo:: String->String
 procesarAtributo atributo=quitarcomillas $ A.dropWhile (/='\"') atributo 
+
+
+limpiarEtiqueta ::String ->String
+limpiarEtiqueta etiqueta =[x| x<-etiqueta,x/='<',x/='>',x/='/']
+
+imprimir ::(String,String)->String
+imprimir (x,y) = "("++x++","++y++")"
+
+procesarAtributo:: String->String
+procesarAtributo atributo=quitarcomillas $ A.dropWhile (/='\"') atributo 
+
+quitarcomillas palabra =[x| x<- palabra ,x /='\"']
