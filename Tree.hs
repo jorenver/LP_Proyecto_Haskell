@@ -7,5 +7,10 @@ singletonTree x = Nodo x []
 insertTree::Tree a->Tree a->Tree a
 insertTree x Vacio = x
 insertTree Vacio x = x
-insertTree x (Nodo s [] )= Nodo s [x]
-insertTree x (Nodo s [t]) = Nodo s (x:[t])
+insertTree (Nodo s [] ) x= Nodo s [x]
+insertTree (Nodo s [t]) x= Nodo s (x:[t])
+
+treeEsHoja:: Tree a-> Bool
+treeEsHoja Vacio = False
+treeEsHoja (Nodo _ []) = True
+treeEsHoja  (Nodo _ [_]) =False
