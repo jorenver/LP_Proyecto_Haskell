@@ -1,6 +1,7 @@
 import Control.Monad
 import Data.Char
 import qualified Data.List as A
+import Tree
 
 --main = forever $ do
 	--			 l <- getLine

@@ -1,9 +1,19 @@
+module Tree
+(Tree (..)
+,singletonTree
+,insertTree
+,treeEsHoja
+)where
+
+
+
+
 data Tree a = Vacio| Nodo a [Tree a] deriving (Show)
 
 singletonTree:: a->Tree a
 singletonTree x = Nodo x []
 
---recibe un elemento y un arbol y lo inserta al arbol
+--recibe dos arboles e inserta al a primer arbol el segundo
 insertTree::Tree a->Tree a->Tree a
 insertTree x Vacio = x
 insertTree Vacio x = x
