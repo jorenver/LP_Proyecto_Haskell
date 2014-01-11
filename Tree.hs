@@ -3,6 +3,7 @@ module Tree
 ,singletonTree
 ,insertTree
 ,treeEsHoja
+,insertElement
 )where
 
 
