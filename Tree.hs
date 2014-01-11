@@ -24,3 +24,21 @@ treeEsHoja:: Tree a-> Bool
 treeEsHoja Vacio = False
 treeEsHoja (Nodo _ []) = True
 treeEsHoja  (Nodo _ [_]) =False
+
+
+insertElement ::Tree a ->Tree a->[Int]->Tree a
+insertElement (Nodo s []) arbol [] =Nodo s [arbol]
+insertElement (Nodo s [y]) arbol [] =Nodo s ([y]++[arbol])
+insertElement Vacio arbol _  = arbol
+insertElement (Nodo s [y]) arbol (x:xs) = Nodo s (unirListas (unirListas(take (x-1) [y]) [insertElement (getByIndex x [y]) arbol xs]) (drop (x+1) [y]))
+  
+getByIndex :: Int->[a]->a
+getByIndex i (x:xs) =if i==1 then
+						x
+					else
+						getByIndex (i-1) xs
+						
+unirListas :: [a]->[a]->[a]
+unirListas p []=p
+unirListas [] s=s
+unirListas p (s:ss) =p++[s]++unirListas p ss
