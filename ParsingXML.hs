@@ -41,3 +41,12 @@ crearTupla palabra = (A.takeWhile (/='=') $ limpiarEtiqueta palabra,cola $ A.dro
 
 cola [] = []
 cola (x:xs)=xs
+
+obtenerLinea:: String->String
+--lee un string hasta que encuentre el caracter del proxima linea y lo retorna
+obtenerLinea []=[]
+obtenerLinea entrada= takeWhile (/='\n') entrada
+
+guardarLineas:: String->[String]
+guardarLineas []=[]
+guardarLineas entrada=obtenerLinea entrada:guardarLineas ( cola $ dropWhile (/='\n') entrada )
