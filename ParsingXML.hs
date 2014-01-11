@@ -22,10 +22,7 @@ limpiarEtiqueta etiqueta =[x| x<-etiqueta,x/='<',x/='>',x/='/']
 imprimir ::(String,String)->String
 imprimir (x,y) = "("++x++","++y++")"
 
-
-
 quitarcomillas palabra =[x| x<- palabra ,x /='\"']
-
 
 procesarEtiqueta ::String->[(String,String)]
 procesarEtiqueta [] = []
@@ -42,6 +39,27 @@ crearTupla palabra = (A.takeWhile (/='=') $ limpiarEtiqueta palabra,cola $ A.dro
 cola [] = []
 cola (x:xs)=xs
 
+crearEtiquetaCierre ::String->String
+crearEtiquetaCierre tag = "<"++tag++"/>"
+			
+esEtiqueta ::String->Bool
+esEtiqueta linea = if (head linea =='<' && last linea =='>' && (length [x| x<-linea ,x=='/'] <= 1)) then
+						True
+					else
+						False
+						
+esEtiquetaApertura ::String->Bool
+esEtiquetaApertura linea = esEtiqueta linea && (length [x| x<-linea ,x=='/'] == 0)
+
+esEtiquetaLinea ::String->Bool
+esEtiquetaLinea linea = if length linea >=4 then
+				if (head $ cola $reverse linea) == '/' then
+					True
+				else
+					False
+			else
+				False
+
 obtenerLinea:: String->String
 --lee un string hasta que encuentre el caracter del proxima linea y lo retorna
 obtenerLinea []=[]
@@ -50,3 +68,6 @@ obtenerLinea entrada= takeWhile (/='\n') entrada
 guardarLineas:: String->[String]
 guardarLineas []=[]
 guardarLineas entrada=obtenerLinea entrada:guardarLineas ( cola $ dropWhile (/='\n') entrada )
+
+
+
