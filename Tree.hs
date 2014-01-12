@@ -29,9 +29,9 @@ treeEsHoja  (Nodo _ [_]) =False
 
 insertElement ::Tree a ->Tree a->[Int]->Tree a
 insertElement (Nodo s []) arbol [] =Nodo s [arbol]
-insertElement (Nodo s [y]) arbol [] =Nodo s ([y]++[arbol])
+insertElement (Nodo s [y]) arbol [] =Nodo s (unirListas [y] [arbol])
 insertElement Vacio arbol _  = arbol
-insertElement (Nodo s [y]) arbol (x:xs) = Nodo s (unirListas (unirListas(take (x-1) [y]) [insertElement (getByIndex x [y]) arbol xs]) (drop (x+1) [y]))
+insertElement (Nodo s [y]) arbol (x:xs) = Nodo s (unirListas (unirListas(take (x-1) [y]) [insertElement (getByIndex x [y]) arbol xs]) (drop (x) [y]))
   
 getByIndex :: Int->[a]->a
 getByIndex i (x:xs) =if i==1 then
