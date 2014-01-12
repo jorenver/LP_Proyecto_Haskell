@@ -40,6 +40,7 @@ getByIndex i (x:xs) =if i==1 then
 						getByIndex (i-1) xs
 						
 unirListas :: [a]->[a]->[a]
-unirListas p []=p
-unirListas [] s=s
-unirListas p (s:ss) =p++[s]++unirListas p ss
+unirListas [] []=[]
+unirListas (p:ps) []=[p]++(unirListas ps [])
+unirListas [] (s:ss)=(unirListas [] ss)++[s]
+unirListas (p:ps) (s:ss) =[p]++(unirListas ps ss)++[s]
