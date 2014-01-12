@@ -69,5 +69,14 @@ guardarLineas:: String->[String]
 guardarLineas []=[]
 guardarLineas entrada=obtenerLinea entrada:guardarLineas ( cola $ dropWhile (/='\n') entrada )
 
+limpiarComentarios:: [Char]->[Char]
+limpiarComentarios []=[]
+limpiarComentarios entrada 
+	     	| (x == '<') && ( head xs == '!' ) = ' ':limpiarComentarios ( cola ( dropWhile (/='>') xs ) )
+		| otherwise = x:limpiarComentarios xs	
+		where x = head entrada
+		      xs = cola entrada
 
-
+listaFiltrada::String->[String]
+listaFiltrada [] = []
+listaFiltrada entrada= guardarLineas$limpiarComentarios entrada
