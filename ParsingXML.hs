@@ -60,15 +60,7 @@ esEtiquetaLinea linea = if length linea >=4 then
 			else
 				False
 
-obtenerLinea:: String->String
---lee un string hasta que encuentre el caracter del proxima linea y lo retorna
-obtenerLinea []=[]
-obtenerLinea entrada= takeWhile (/='\n') entrada
-
-guardarLineas:: String->[String]
-guardarLineas []=[]
-guardarLineas entrada=obtenerLinea entrada:guardarLineas ( cola $ dropWhile (/='\n') entrada )
-
+-- recibira un cadena que representa el archivo de texto y removera los comentarios
 limpiarComentarios:: [Char]->[Char]
 limpiarComentarios []=[]
 limpiarComentarios entrada 
@@ -77,6 +69,26 @@ limpiarComentarios entrada
 		where x = head entrada
 		      xs = cola entrada
 
+obtenerLinea:: String->String
+-- lee un string hasta que encuentre el caracter del proxima linea y lo retorna
+obtenerLinea []=[]
+obtenerLinea entrada= takeWhile (/='\n') entrada
+
+-- retorna una lista en donde cada elemento es una linea de texto
+guardarLineas:: String->[String]
+guardarLineas []=[]
+guardarLineas entrada=obtenerLinea entrada:guardarLineas ( cola $ dropWhile (/='\n') entrada )
+
+-- Recibe un String y quita las tabulaciones o espacios al principio de la cadena
+quitarTab:: String->String
+quitarTab []=[]
+quitarTab (x:xs) | (x==' ') =  dropWhile (==' ') xs
+ 		 |  x/=' '  =  x:xs
+
+
+-- Retorna una lista en donde cada elemento hay una linea de texto que va a ser procesada en el arbol
 listaFiltrada::String->[String]
 listaFiltrada [] = []
-listaFiltrada entrada= guardarLineas$limpiarComentarios entrada
+listaFiltrada entrada=  [ x | x<-lista, length(x)>1] 
+			where lista = map (quitarTab) (guardarLineas(limpiarComentarios entrada))
+-- Se evita las lineas que solo tienen un caracter 
