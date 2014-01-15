@@ -99,11 +99,11 @@ listaFiltrada'' entrada=  [ x | x<-lista, length(x)>1]
 
 sembrarArbol :: [String]->[String]->Tree [(String,String)]->Int->Tree [(String,String)]
 sembrarArbol [] [] arbol  _ = arbol
-sembrarArbol [] _ _  _ = error "error de Parsing 1"
+sembrarArbol [] _ _  _ = error "no se cerraron todas las etiquetas correctamente"
 sembrarArbol (x:xs) [] Vacio nivel =if  (esEtiquetaApertura x )then
 												sembrarArbol xs [crearEtiquetaCierre $ obtenerTag $ procesarEtiqueta x]  (insertElemento Vacio (singletonTree $ procesarEtiqueta x) 0) 0
 											else
-												error "error de Parsing 2"
+												error "no se econtro apertura del XML"
 sembrarArbol [x] [y] arbol _ =arbol
 sembrarArbol (x:xs) (y:ys) arbol nivel 
 			| esEtiquetaApertura x =sembrarArbol xs ((crearEtiquetaCierre $ obtenerTag $ procesarEtiqueta x):(y:ys)) (insertElemento arbol (singletonTree $ procesarEtiqueta x) nivel) (nivel+1)
