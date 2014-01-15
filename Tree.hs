@@ -4,6 +4,7 @@ module Tree
 ,insertTree
 ,treeEsHoja
 ,insertElement
+,insertElemento
 )where
 
 
@@ -31,10 +32,18 @@ insertElement ::Tree a ->Tree a->[Int]->Tree a
 insertElement (Nodo s []) arbol [] =Nodo s [arbol]
 insertElement (Nodo s y) arbol [] =Nodo s (y++[arbol])
 insertElement Vacio arbol _  = arbol
-insertElement (Nodo s y) arbol (x:xs) = Nodo s (((take (x-1) y)++ [(insertElement (getByIndex x y) arbol xs)])++(drop (x) y))
-  
+insertElement (Nodo s y) arbol (x:xs) = Nodo s (((take (x) y)++ [(insertElement (getByIndex x y) arbol xs)])++(drop (x+1) y))
+
+
+insertElemento ::Tree a ->Tree a->Int->Tree a
+insertElemento (Nodo s []) arbol 0 =Nodo s [arbol]
+insertElemento (Nodo s y) arbol 0 =Nodo s (y++[arbol])
+insertElemento Vacio arbol _  = arbol
+insertElemento (Nodo s y) arbol n = Nodo s ((init y)++ [(insertElemento (last y) arbol (n-1))])
+ 
+ 
 getByIndex :: Int->[a]->a
-getByIndex i (x:xs) =if i==1 then
+getByIndex i (x:xs) =if i==0 then
 						x
 					else
 						getByIndex (i-1) xs
