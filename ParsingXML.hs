@@ -2,9 +2,11 @@ import Control.Monad
 import Data.Char
 import qualified Data.List as A
 import Tree
+import System.IO
 
 main = do 
-		contents <- getContents
+		handle <- openFile "prueba.xml" ReadMode
+		contents <- hGetContents handle
 		let arbol = sembrarArbol $listaFiltrada contents
 		print("\n")
 
@@ -18,7 +20,7 @@ procesarAtributo atributo=quitarcomillas $ A.dropWhile (/='\"') atributo
 
 
 limpiarEtiqueta ::String ->String
-limpiarEtiqueta etiqueta =[x| x<-etiqueta,x/='<',x/='>',x/='/']
+limpiarEtiqueta etiqueta =[x| x<-etiqueta,x/='<',x/='>',x/='/',x /='\"']
 
 imprimir ::(String,String)->String
 imprimir (x,y) = "("++x++","++y++")"
@@ -27,9 +29,8 @@ quitarcomillas palabra =[x| x<- palabra ,x /='\"']
 
 procesarEtiqueta ::String->[(String,String)]
 procesarEtiqueta [] = []
-procesarEtiqueta etiqueta= (crearTupla $ A.takeWhile (/=' ') $ limpiarEtiqueta etiqueta):(procesarEtiqueta $ cola $ A.dropWhile (/=' ') etiqueta)  
-				--where palabra = A.takeWhile (/=' ') $ limpiarEtiqueta etiqueta
-		              --sobrante = tail $ A.dropWhile (/=' ') etiqueta
+procesarEtiqueta etiqueta= (crearTupla $ A.takeWhile (/=' ') $ limpiarEtiqueta  etiqueta):(procesarEtiqueta $ cola $ A.dropWhile (/=' ') etiqueta)  
+				
 
 		  
 crearTupla ::String->(String,String)
@@ -70,6 +71,8 @@ obtenerLinea:: String->String
 obtenerLinea []=[]
 obtenerLinea entrada= takeWhile (/='\n') entrada
 
+esLinea ::String->Bool
+esLinea linea =
 guardarLineas:: String->[String]
 guardarLineas []=[]
 guardarLineas entrada=obtenerLinea entrada:guardarLineas ( cola $ dropWhile (/='\n') entrada )
@@ -86,8 +89,8 @@ limpiarComentarios entrada
 -- Recibe un String y quita las tabulaciones o espacios al principio de la cadena
 quitarTab:: String->String
 quitarTab []=[]
-quitarTab (x:xs) | (x==' ') =  dropWhile (==' ') xs
-                  |  x/=' '  =  x:xs
+quitarTab (x:xs) | (x=='\t') || (x==' ') =  quitarTab xs
+                  |  otherwise  =  x:xs
 
 
 -- Retorna una lista en donde cada elemento hay una linea de texto que va a ser procesada en el arbol
@@ -106,11 +109,11 @@ sembrarArbol (x:xs) [] Vacio nivel =if  (esEtiquetaApertura x )then
 												error "error de Parsing 2"
 sembrarArbol [x] [y] arbol _ =arbol
 sembrarArbol (x:xs) (y:ys) arbol nivel 
-			|  esEtiquetaApertura x = sembrarArbol xs ((crearEtiquetaCierre $ obtenerTag $ procesarEtiqueta x):(y:ys)) (insertElemento arbol (singletonTree $ procesarEtiqueta x) nivel) (nivel+1)
+			|  esEtiquetaApertura x =sembrarArbol xs ((crearEtiquetaCierre $ obtenerTag $ procesarEtiqueta x):(y:ys)) (insertElemento arbol (singletonTree $ procesarEtiqueta x) nivel) (nivel+1)
 			|  esEtiquetaLinea x = sembrarArbol xs (y:ys) (insertElemento arbol (singletonTree $ procesarEtiqueta x) nivel ) (nivel)
 			--es una etiqueta de cierre debe comprobarse con la pila
-			| y==x = sembrarArbol xs ys arbol (nivel-1)
-			| otherwise=error (x++"error de Parsing 3"++y)
+			| x==y = sembrarArbol xs ys arbol (nivel-1)
+			| otherwise=error ("error de Parsing se esperaba"++x++",se econtro"++y)
 			
 			
 listInsertByIndex :: [a]->a->Int->[a]
