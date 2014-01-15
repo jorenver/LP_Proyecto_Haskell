@@ -22,21 +22,17 @@ procesarAtributo atributo=quitarcomillas $ A.dropWhile (/='\"') atributo
 limpiarEtiqueta ::String ->String
 limpiarEtiqueta etiqueta =[x| x<-etiqueta,x/='<',x/='>',x/='/',x /='\"']
 
-imprimir ::(String,String)->String
-imprimir (x,y) = "("++x++","++y++")"
+-- imprimir ::(String,String)->String
+-- imprimir (x,y) = "("++x++","++y++")"
 
 quitarcomillas palabra =[x| x<- palabra ,x /='\"']
 
 procesarEtiqueta ::String->[(String,String)]
 procesarEtiqueta [] = []
 procesarEtiqueta etiqueta= (crearTupla $ A.takeWhile (/=' ') $ limpiarEtiqueta  etiqueta):(procesarEtiqueta $ cola $ A.dropWhile (/=' ') etiqueta)  
-				
-
 		  
 crearTupla ::String->(String,String)
 crearTupla palabra = (A.takeWhile (/='=') $ limpiarEtiqueta palabra,cola $ A.dropWhile (/='=') palabra)
-		   --where primero=A.takeWhile (/='=') $ limpiarEtiqueta palabra
-			    -- segundo=tail $ A.dropWhile (/='=') palabra
 
 cola [] = []
 cola (x:xs)=xs
@@ -67,15 +63,14 @@ esEtiquetaLinea linea = if length linea >=4 then
 				False
 
 obtenerLinea:: String->String
---lee un string hasta que encuentre el caracter del proxima linea y lo retorna
+-- lee un string hasta que encuentre el caracter del proxima linea y lo retorna
 obtenerLinea []=[]
 obtenerLinea entrada= takeWhile (/='\n') entrada
 
-esLinea ::String->Bool
-esLinea linea =
 guardarLineas:: String->[String]
 guardarLineas []=[]
 guardarLineas entrada=obtenerLinea entrada:guardarLineas ( cola $ dropWhile (/='\n') entrada )
+
 
 limpiarComentarios:: [Char]->[Char]
 limpiarComentarios []=[]
@@ -92,13 +87,15 @@ quitarTab []=[]
 quitarTab (x:xs) | (x=='\t') || (x==' ') =  quitarTab xs
                   |  otherwise  =  x:xs
 
-
 -- Retorna una lista en donde cada elemento hay una linea de texto que va a ser procesada en el arbol
 listaFiltrada::String->[String]
 listaFiltrada [] = []
 listaFiltrada entrada=  [ x | x<-lista, length(x)>1] 
                         where lista = map (quitarTab) (guardarLineas(limpiarComentarios entrada))
 
+listaFiltrada' entrada = ignorarLineaNormal(listaFiltrada entrada)
+listaFiltrada'' entrada=  [ x | x<-lista, length(x)>1] 
+                          where lista=  listaFiltrada' entrada
 
 sembrarArbol :: [String]->[String]->Tree [(String,String)]->Int->Tree [(String,String)]
 sembrarArbol [] [] arbol  _ = arbol
@@ -109,13 +106,24 @@ sembrarArbol (x:xs) [] Vacio nivel =if  (esEtiquetaApertura x )then
 												error "error de Parsing 2"
 sembrarArbol [x] [y] arbol _ =arbol
 sembrarArbol (x:xs) (y:ys) arbol nivel 
-			|  esEtiquetaApertura x =sembrarArbol xs ((crearEtiquetaCierre $ obtenerTag $ procesarEtiqueta x):(y:ys)) (insertElemento arbol (singletonTree $ procesarEtiqueta x) nivel) (nivel+1)
-			|  esEtiquetaLinea x = sembrarArbol xs (y:ys) (insertElemento arbol (singletonTree $ procesarEtiqueta x) nivel ) (nivel)
-			--es una etiqueta de cierre debe comprobarse con la pila
-			| x==y = sembrarArbol xs ys arbol (nivel-1)
-			| otherwise=error ("error de Parsing se esperaba"++x++",se econtro"++y)
-			
-			
+			| esEtiquetaApertura x =sembrarArbol xs ((crearEtiquetaCierre $ obtenerTag $ procesarEtiqueta x):(y:ys)) (insertElemento arbol (singletonTree $ procesarEtiqueta x) nivel) (nivel+1)
+        		| esEtiquetaLinea x = sembrarArbol xs (y:ys) (insertElemento arbol (singletonTree $ procesarEtiqueta x) nivel ) (nivel)
+			| y==x = sembrarArbol xs ys arbol (nivel-1)
+			-- | esLineaNormal x = sembrarArbol xs (y:ys) (insertElemento arbol (singletonTree $ procesarLinea x) nivel ) (nivel)
+  			| otherwise = error ("error de Parsing se esperaba"++x++",se econtro"++y)	
+	
+esEtiquetaCierre::String->Bool
+esEtiquetaCierre (x:xs)= head(xs) == '/'
+		
+esLineaNormal::String->Bool
+esLineaNormal [] = False
+esLineaNormal entrada = not(esEtiquetaApertura entrada) && not(esEtiquetaLinea entrada)&&not(esEtiquetaCierre entrada)
+
+ignorarLineaNormal []=[]
+ignorarLineaNormal (x:xs) 
+			| esLineaNormal x = "":(ignorarLineaNormal xs)
+			| otherwise = x: ignorarLineaNormal xs 
+								
 listInsertByIndex :: [a]->a->Int->[a]
 listInsertByIndex [] y _=[y]
 listInsertByIndex (x:xs) y n=if n==1 then
